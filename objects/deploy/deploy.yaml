@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social
+  namespace: social-ns
+  annotations:
+    v8tix.com/created-by: "V8TIX"
+    v8tix.com/mail: "info@v8tix.com"
+    v8tix.com/imageregistry: "https://hub.docker.com/"
+    v8tix.com/app: "Katix"
+    v8tix.com/app-tier: "Back-end"
+    v8tix.com/environment: "Development"
+    v8tix.com/release: "Canary"
+    v8tix.com/tenant: "None"
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  revisionHistoryLimit: 2
+  minReadySeconds: 10
+  replicas: 1
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - social
+  template:
+    metadata:
+      labels:
+        app: social
+    spec:
+      serviceAccountName: social-sa
+      volumes:
+        - name: social-db-conn-vol
+          secret:
+            secretName: social-db-conn
+        - name: log-vol
+          persistentVolumeClaim:
+            claimName: social-log-pvc
+            readOnly: false
+      containers:
+        - name: social
+          imagePullPolicy: IfNotPresent
+          image: v8tix/xhidon:0.0.2.v20200324.dbf3fe4
+          volumeMounts:
+            - name: social-db-conn-vol
+              mountPath: /home/v8tix/conn
+              readOnly: true
+            - name: log-vol
+              mountPath: /var/log
+          terminationMessagePath: /var/log/social.log
+          env:
+            - name: HOST
+              value: "localhost"
+            - name: CNTR_PORT
+              value: "8080"
+            - name: CNTR_MICROSERVICE_CONF_DIR
+              value: "/home/v8tix/configuration/"
+            - name: SPRING_PROFILE
+              value: "prod"
+            - name: CONFIG_TEMPLATE_DIR
+              value: "/home/v8tix/templates"
+            - name: DB_CNTR_CONN_DIR
+              value: "/home/v8tix/conn"
+            - name: MICROSERVICE_VERSION
+              value: "1.0.0.v20200309"
+            - name: CNTR_MICROSERVICE_DIR
+              value: "/home/v8tix/fatjar"
+            - name: FATJAR_NAME
+              value: "social-1.0.0.v20200309.jar"
+            - name: FATJAR
+              value: $(CNTR_MICROSERVICE_DIR)/$(FATJAR_NAME)
+            - name: CONFIG_DIR
+              value: "/home/v8tix/config/"
+            - name: JAVA_IO_DIR
+              value: "/home/v8tix/"
+          args: [
+            "$(CNTR_MICROSERVICE_CONF_DIR)",
+            "$(SPRING_PROFILE)",
+            "$(CONFIG_TEMPLATE_DIR)",
+            "$(DB_CNTR_CONN_DIR)",
+            "$(HOST)",
+            "$(CNTR_PORT)",
+            "$(MICROSERVICE_VERSION)",
+            "$(FATJAR)",
+            "$(JAVA_IO_DIR)"
+          ]
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/
+              port: http
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/
+              port: http
+            initialDelaySeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 6
+#          lifecycle:
+#            postStart:
+#              exec:
+#                command: ["/bin/bash", "-c", "/home/v8tix/hooks/post_start.sh"]
+#            preStop:
+#              exec:
+#                command: ["/bin/bash", "-c", "/home/v8tix/hooks/pre_stop.sh"]
