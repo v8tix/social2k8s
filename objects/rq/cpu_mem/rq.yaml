@@ -13,7 +13,7 @@ metadata:
     v8tix.com/tenant: "None"
 spec:
   hard:
-    requests.cpu: 2
-    requests.memory: 1Gi
-    limits.cpu: 2
-    limits.memory: 1Gi
+    requests.cpu: 4
+    requests.memory: 4Gi
+    limits.cpu: 4
+    limits.memory: 4Gi

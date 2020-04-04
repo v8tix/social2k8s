@@ -22,14 +22,14 @@ spec:
       memory: 1Gi
   - type: Container
     defaultRequest:
-      cpu: 2
-      memory: 512Mi
+      cpu: 100m
+      memory: 10Mi
     default:
-      cpu: 2
-      memory: 512Mi
+      cpu: 100m
+      memory: 10Mi
     min:
-      cpu: 2
-      memory: 50m
+      cpu: 50m
+      memory: 1Mi
     max:
       cpu: 2
       memory: 512Mi

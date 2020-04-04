@@ -4,7 +4,7 @@ dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 
 echo -ne "Container logs: \n"
-kubectl logs "${POD}" -c "${CNTR_1}"
+kubectl logs "${POD}" -c "${CNTR_2}"
 echo -ne "\n\n"
 #echo -ne "Previous Container logs: \n"
 #kubectl logs "${POD}" --previous

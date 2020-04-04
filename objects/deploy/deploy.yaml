@@ -42,7 +42,18 @@ spec:
             claimName: social-log-pvc
             readOnly: false
       containers:
+        - name: sidecar
+          image: v8tix/rhoon:0.0.1.v20200404.eee5504
+          command: ["/bin/bash"]
+          args: ["-c", "while true; do echo hello; sleep 10;done"]
         - name: social
+          resources:
+            requests:
+              cpu: 1
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
           imagePullPolicy: IfNotPresent
           image: v8tix/xhidon:0.0.2.v20200324.dbf3fe4
           volumeMounts:

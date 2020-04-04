@@ -62,7 +62,6 @@ Welcome to the social2k8s project. These objects are part of the [k8sb](https://
 #### 8. The PersistentVolumeClaim object.
 * Enter to the objects/pvc directory.
 * Execute ./create.sh.
-* Enter to the objects/pvc
 * Execute ./get_pvc.sh.
 * Execute ./get_pv.sh.
 
